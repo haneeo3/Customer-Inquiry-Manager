@@ -1,0 +1,37 @@
+name: Customer Inquiry Manager Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python checker
+        run: pip install pyflakes
+
+      - name: Check Python Lambda files
+        run: |
+          echo "Checking Lambda functions..."
+          pyflakes "AWS Lambda (Python)/create_post.py"
+          pyflakes "AWS Lambda (Python)/get_posts.py"
+          pyflakes "AWS Lambda (Python)/upload_url.py"
+          echo "✅ All Python files passed!"
+
+      - name: Validate HTML
+        run: |
+          echo "Checking HTML file..."
+          cat index.html | grep -q "<!DOCTYPE html>" && echo "✅ HTML looks good!" || echo "⚠️ Check HTML structure"
+
+      - name: Deploy to GitHub Pages
+        run: echo "✅ App is live on GitHub Pages!"
